@@ -14,9 +14,10 @@ def change(item, chan, audit_data):
                     return mod_value["newValue"]
                 if isinstance(attr_value, dict) and attr_name in mod:
                     attr_details = mod[attr_name]
+                    new_value = attr_details.get("newValue")
                     if attr_details["name"] in attr_value and attr_value[attr_details["name"]] == attr_details["oldValue"]:
-                        attr_value[attr_details["name"]] = attr_details["newValue"]
-                        update_audit(attr_details["name"], attr_details["oldValue"], attr_details["newValue"])
+                        attr_value[attr_details["name"]] = new_value
+                        update_audit(attr_details["name"], attr_details["oldValue"], new_value)
         return attr_value
 
     def process_sub_attr(sub_attr, modifications):
@@ -30,8 +31,7 @@ def change(item, chan, audit_data):
     def traverse_attributes(sub_attributes, modifications):
         for sub_attr_list in sub_attributes.values():
             for sub_attr in sub_attr_list:
-                group_header = sub_attr.get("groupHeader")
-                change(sub_attr, modifications, audit_data) if group_header else process_sub_attr(sub_attr, modifications)
+                (change if sub_attr.get("groupHeader") else process_sub_attr)(sub_attr, modifications)
 
     traverse_attributes(item.get("subattrOutput", {}), chan)
     return item, audit_data
