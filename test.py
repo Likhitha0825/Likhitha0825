@@ -1,42 +1,37 @@
 def change(item, chan, audit_data):
-    def update_value(attr_name, attr_value, modifications, audit):
-        """Update string or dictionary values and record audit."""
-        if isinstance(attr_value, str):
-            for mod in modifications:
-                for _, mod_value in mod.items():
-                    if mod_value["oldValue"] == attr_value:
-                        attr_value = mod_value["newValue"]
-                        update_audit(attr_name, mod_value["oldValue"], mod_value["newValue"], audit)
-        elif isinstance(attr_value, dict):
-            for mod in modifications:
-                if attr_name in mod:
-                    attr_details = mod[attr_name]
-                    for key, value in attr_value.items():
-                        if attr_details.get("name") == key and attr_details.get("oldValue") == value:
-                            attr_value[key] = attr_details["newValue"]
-                            update_audit(attr_details["name"], attr_details["oldValue"], attr_details["newValue"], audit)
-        return attr_value
-
-    def update_audit(attr_name, old_value, new_value, audit):
-        """Record the change in audit."""
-        audit.append({
+    def update_audit(attr_name, old_value, new_value):
+        audit_data.append({
             "attrName": attr_name,
             "oldValue": old_value,
-            "newValue": new_value,
+            "newValue": new_value
         })
 
-    def process_sub_attributes(sub_attributes, modifications, audit):
-        """Process each sub-attribute recursively or update its values."""
+    def update_attr_value(attr_name, attr_value, modifications):
+        for mod in modifications:
+            for _, mod_value in mod.items():
+                if isinstance(attr_value, str) and mod_value["oldValue"] == attr_value:
+                    update_audit(attr_name, mod_value["oldValue"], mod_value["newValue"])
+                    return mod_value["newValue"]
+                if isinstance(attr_value, dict) and attr_name in mod:
+                    attr_details = mod[attr_name]
+                    if attr_details["name"] in attr_value and attr_value[attr_details["name"]] == attr_details["oldValue"]:
+                        attr_value[attr_details["name"]] = attr_details["newValue"]
+                        update_audit(attr_details["name"], attr_details["oldValue"], attr_details["newValue"])
+        return attr_value
+
+    def process_sub_attr(sub_attr, modifications):
+        attr_data = sub_attr.get("value", [{}])[0]
+        attr_data["attrValue"] = update_attr_value(
+            attr_data.get("attrName", ""),
+            attr_data.get("attrValue", ""),
+            modifications
+        )
+
+    def traverse_attributes(sub_attributes, modifications):
         for sub_attr_list in sub_attributes.values():
             for sub_attr in sub_attr_list:
-                if sub_attr.get("groupHeader"):
-                    change(sub_attr, modifications, audit)
-                else:
-                    attr_data = sub_attr.get("value", [{}])[0]
-                    attr_name = attr_data.get("attrName", "")
-                    attr_value = attr_data.get("attrValue", "")
-                    attr_data["attrValue"] = update_value(attr_name, attr_value, modifications, audit)
+                group_header = sub_attr.get("groupHeader")
+                change(sub_attr, modifications, audit_data) if group_header else process_sub_attr(sub_attr, modifications)
 
-    # Start processing sub-attributes
-    process_sub_attributes(item.get("subattrOutput", {}), chan, audit_data)
+    traverse_attributes(item.get("subattrOutput", {}), chan)
     return item, audit_data
