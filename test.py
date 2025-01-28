@@ -1,37 +1,97 @@
-def change(item, chan, audit_data):
-    def update_audit(attr_name, old_value, new_value):
-        audit_data.append({
-            "attrName": attr_name,
-            "oldValue": old_value,
-            "newValue": new_value
+def process(item):
+    entity_data = initialize_entity_data(item)
+    subattr_output_list = process_subattr_output(item)
+    entity_data["subattrOutput"] = subattr_output_list if subattr_output_list else []
+    return entity_data
+
+
+def initialize_entity_data(item):
+    """Initialize the entity data with default values."""
+    return {
+        "name": item.get("displayProperties", {}).get("displayName", ""),
+        "subattrOutput": [],
+        "value": [
+            {
+                "editableData": [
+                    {
+                        "attrName": None,
+                        "attrValue": None
+                    }
+                ],
+                "score": None,
+                "highlight": None,
+                "displayName": item.get("displayProperties", {}).get("displayName", "")
+            }
+        ],
+        "groupHeader": item.get('groupHeader', ''),
+        "displayProperties": {
+            "displayStyle": item.get("displayProperties", {}).get("displayStyle", "")
+        }
+    }
+
+
+def process_subattr_output(item):
+    """Process the 'subattrOutput' of the item and return the list."""
+    subattr_output_list = []
+    for sub_attr_key, sub_attr_list in item.get("subattrOutput", {}).items():
+        for sub_attr in sub_attr_list:
+            if sub_attr.get("groupHeader", ""):
+                nested_item = process_nested_subattr(sub_attr)
+                subattr_output_list.append(nested_item)
+            else:
+                subattr_output_list = process_non_grouped_subattr(item, sub_attr, subattr_output_list)
+    return subattr_output_list
+
+
+def process_nested_subattr(sub_attr):
+    """Process a nested sub-attribute."""
+    group_header = sub_attr.get("groupHeader", "")
+    nested_item = process(sub_attr)
+    nested_item["groupHeader"] = group_header
+    return nested_item
+
+
+def process_non_grouped_subattr(item, sub_attr, subattr_output_list):
+    """Process sub-attributes that are not grouped and append them to the output list."""
+    attr_value = sub_attr.get("value", [{}])[0].get("attrValue", "")
+    editable_data = extract_editable_data(attr_value, sub_attr)
+    value = {
+        "editableData": editable_data,
+        "score": sub_attr.get("score", 0),
+        "highlight": sub_attr.get("displayProperties", {}).get("highlight", ""),
+        "displayName": sub_attr.get("displayProperties", {}).get("displayName", "")
+    }
+    if not subattr_output_list:
+        subattr_output_list.append(create_default_subattr_output(item))
+    subattr_output_list[0]["value"].append(value)
+    return subattr_output_list
+
+
+def extract_editable_data(attr_value, sub_attr):
+    """Extract editable data from the attribute value."""
+    editable_data = []
+    if isinstance(attr_value, dict):
+        for key, value in attr_value.items():
+            editable_data.append({
+                "attrName": key,
+                "attrValue": value
+            })
+    elif isinstance(attr_value, str):
+        editable_data.append({
+            "attrName": sub_attr.get("displayProperties", {}).get("displayName", ""),
+            "attrValue": attr_value
         })
+    return editable_data
 
-    def update_attr_value(attr_name, attr_value, modifications):
-        for mod in modifications:
-            for _, mod_value in mod.items():
-                if isinstance(attr_value, str) and mod_value["oldValue"] == attr_value:
-                    update_audit(attr_name, mod_value["oldValue"], mod_value["newValue"])
-                    return mod_value["newValue"]
-                if isinstance(attr_value, dict) and attr_name in mod:
-                    attr_details = mod[attr_name]
-                    new_value = attr_details.get("newValue")
-                    if attr_details["name"] in attr_value and attr_value[attr_details["name"]] == attr_details["oldValue"]:
-                        attr_value[attr_details["name"]] = new_value
-                        update_audit(attr_details["name"], attr_details["oldValue"], new_value)
-        return attr_value
 
-    def process_sub_attr(sub_attr, modifications):
-        attr_data = sub_attr.get("value", [{}])[0]
-        attr_data["attrValue"] = update_attr_value(
-            attr_data.get("attrName", ""),
-            attr_data.get("attrValue", ""),
-            modifications
-        )
-
-    def traverse_attributes(sub_attributes, modifications):
-        for sub_attr_list in sub_attributes.values():
-            for sub_attr in sub_attr_list:
-                (change if sub_attr.get("groupHeader") else process_sub_attr)(sub_attr, modifications)
-
-    traverse_attributes(item.get("subattrOutput", {}), chan)
-    return item, audit_data
+def create_default_subattr_output(item):
+    """Create a default sub-attribute output dictionary."""
+    return {
+        "name": None,
+        "subattrOutput": [],
+        "value": [],
+        "groupHeader": item.get('groupHeader', ''),
+        "displayProperties": {
+            "displayStyle": item.get("displayProperties", {}).get("displayStyle", "key_value_pair")
+        },
+    }
