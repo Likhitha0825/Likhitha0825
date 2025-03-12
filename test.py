@@ -1,37 +1,34 @@
-def change(item, chan,audit_data):
-    audit=audit_data
-    modi_chan = chan
-    for sub_attr_key, sub_attr_list in item.get("subattrOutput", {}).items():
-        for sub_attr in sub_attr_list:
-            group_header = sub_attr.get("groupHeader", "")
-            if group_header:
-                change(sub_attr, modi_chan,audit)
-            else:
-                attr_name = sub_attr.get("value", [{}])[0].get("attrName", "")
-                attr_value = sub_attr.get("value", [{}])[0].get("attrValue", "")
-                for dic in modi_chan:
-                    if isinstance(attr_value, str):
-                        for dic_key, dic_value in dic.items():
-                            if dic_value["oldValue"] == attr_value:
-                                sub_attr["value"][0]["attrValue"] = dic_value["newValue"]
-                                data = {
-                                    "attrName": attr_name,
-                                    "oldValue": dic_value["oldValue"],
-                                    "newValue": dic_value["newValue"]
-                                }
-                                audit.append(data)
-                    elif isinstance(attr_value, dict):
-                        if attr_name in dic:
-                            attr_details = dic[attr_name]
-                            for key, value in attr_value.items():
-                                if attr_details.get("name") == key and attr_details.get("oldValue") == value:
-                                    attr_value[key] = attr_details.get("newValue")
-                                    data = {
-                                        "attrName": attr_details.get("name"),
-                                        "oldValue": attr_details.get("oldValue"),
-                                        "newValue": attr_details.get("newValue")
-                                    }
-                                    audit.append(data)
-    return item,audit
-
-
+def validate(self):
+        jsonstr = output_json(self.output_json)
+        list_dfs,name_dic=output_excel(jsonstr)
+        index_list=get_index_list_bs(name_dic)
+        final_dict=[]
+        for index in index_list:
+            work_dict=list_dfs[index]
+            work_dict.columns = map(str.lower, work_dict.columns)
+            p_li=[]
+            for nm in work_dict['name']:
+                p_li.append(nm.split('|')[1])
+            work_dict['pageNum']=p_li        
+            BankStatement.validate(work_dict)
+            list(work_dict['name'])
+            alr_added=[]
+            temp_dict={}
+            self.check_pass_or_fail(work_dict,alr_added,temp_dict)
+            for i in temp_dict:
+                k="Page"+str(i)+" "
+                if temp_dict[i]["Passed"]:
+                    x='|'.join(temp_dict[i]["Passed"])
+                    tpdict={}
+                    tpdict["attr_name"]=k+x
+                    tpdict["attr_status"]="Passed"
+                    final_dict.append(tpdict)
+                if temp_dict[i]["Failed"]:
+                    tfdict={}
+                    x='|'.join(temp_dict[i]["Failed"])
+                    tfdict["attr_name"]=k+x
+                    tfdict["attr_status"]="Failed"
+                    final_dict.append(tfdict)               
+            valid_str=json.dumps(final_dict)
+            self.validation_dict=valid_str      
+        return
