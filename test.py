@@ -1,4 +1,21 @@
-    def check_pass_or_fail(self,work_dict,alr_added,temp_dict):
+    def populate_pass_or_fail(self,row,temp_dict,ind,li):
+        try:
+            if row["conf_score"]==100:
+                temp_dict[ind]["Passed"].append(li[2])
+            else:
+                temp_dict[ind]["Failed"].append(li[2])
+        except Exception as e:
+            logger.exception(f'error in populate_pass_or_fail as {e}')
+
+
+
+
+
+
+
+
+
+def check_pass_or_fail(self,work_dict,alr_added,temp_dict):
         for i,row in work_dict.iterrows():
             try:
                 d2=None
