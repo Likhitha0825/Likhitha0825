@@ -1,46 +1,22 @@
- name_dic  is {0: 'Account Statement -1', 1: 'Bank Details -1'}
-
-
-def output_excel(extract_json, template_name):
-    try:
-        global append_name
-        data = json.loads(extract_json)
-        li = []
-        excel_dic = {}
-        if template_name.startswith("Financial Statement"):
-            recr2(data)
-            li = list(data.keys())
-            for i in li:
-                excel_dic[i] = pd.DataFrame(append_name[i])
-            list_dfs = []
-            name_dic = {}
-            for i in excel_dic:
-                list_dfs.append(excel_dic[i])
-            for i, j in enumerate(li):
-                if len(j) <= 31:
-                    name_dic[i] = j
-                else:
-                    name_dic[i] = j.replace("Statement of", "")
-        elif template_name == "Bank Statement":
-            check_multiple_extractions(data)
-            bs_dic = data["Bankstatements"][0]
-            new_data = data["Bankstatements"][0]["Bankstatement - 1"][0]
-            recr2(new_data)
-            li = list(new_data.keys())
-            list_dfs = []
-            name_dic = {}
-            for k in bs_dic.keys():
-                excel_dic = {}
-                new_data = data["Bankstatements"][0][k][0]
-                recr2(new_data)
-                li = list(new_data.keys())
-                for i in li:
-                    excel_dic[i + " -" + k[-1]] = pd.DataFrame(append_name[i])
-                for j in excel_dic:
-                    list_dfs.append(excel_dic[j])
-                add_num = int(k[-1]) - 1
-                add_num *= 2
-                get_name_dic(li, name_dic, add_num, k)
-        return list_dfs, name_dic
-    except Exception as e:
-        logger.exception(f"Output Excel: {e}")
+    def check_pass_or_fail(self,work_dict,alr_added,temp_dict):
+        for i,row in work_dict.iterrows():
+            try:
+                d2=None
+                d1 = parse(str(row['transaction date']).strip(), fuzzy=True)
+                if d1.year<2000 or d1.year>date.today().year:
+                    raise InvalidDate
+                if Bank.VAL_DATE in row.keys():
+                    d2=parse(str(row[Bank.VAL_DATE]).strip(), fuzzy=True)
+                    if d2.year<2000 or d2.year>date.today().year:   
+                        raise InvalidDate
+            except Exception as f:
+                row['conf_score']=60
+                logger.info(f'Exception inside validate bank as {f}')
+            li=row["name"].split('|')
+            ind=li[1]
+            if ind not in alr_added:
+                alr_added.append(ind)
+                temp_dict[ind]={}
+                temp_dict[ind]["Passed"]=[]
+                temp_dict[ind]["Failed"]=[]
+            self.populate_pass_or_fail(row,temp_dict,ind,li)
