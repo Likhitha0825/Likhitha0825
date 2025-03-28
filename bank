@@ -2,28 +2,6 @@ list1 ['Page 18 : Row-27, Row-28', 'Page 19 : Row-51, Row-52', 'Page 20 : Row-56
 
 list2 ['Page 18 : Row-27, Row-28', 'Page 19 : Row-51, Row-52', 'Page 20 : Row-56', 'Page 1 : Row-2, Row-3, Row-7, Row-8, Row-9, Row-10, Row-11, Row-12, Row-13, Row-14, Row-15, Row-16, Row-17, Row-18, Row-19, Row-20, Row-22, Row-23, Row-24, Row-25', 'Page 2 : Row-27, Row-28, Row-29, Row-30, Row-31, Row-32, Row-33, Row-34, Row-35, Row-36, Row-40, Row-41, Row-42, Row-43, Row-44, Row-45, Row-46, Row-47', 'Page 3 : Row-19, Row-20, Row-21, Row-22, Row-23, Row-24', 'Page 4 : Row-28, Row-46, Row-47, Row-49, Row-50', 'Page 5 : Row-55, Row-56', 'Page 6 : Row-2, Row-3, Row-4, Row-5, Row-6, Row-7, Row-8, Row-9, Row-10, Row-11, Row-12, Row-13, Row-14, Row-15, Row-16, Row-17, Row-18, Row-19, Row-20, Row-21, Row-22, Row-23, Row-24, Row-25', 'Page 7 : Row-29, Row-30', 'Page 10 : Row-18, Row-20', 'Page 11 : Row-4, Row-5', 'Page 12 : Row-2, Row-3, Row-21, Row-22', 'Page 13 : Row-44, Row-45', 'Page 14 : Row-13, Row-27', 'Page 15 : Row-46, Row-47', 'Page 16 : Row-2, Row-3, Row-7, Row-8, Row-9, Row-10, Row-11, Row-12, Row-13, Row-14, Row-15, Row-17, Row-20, Row-21, Row-22', 'Page 17 : Row-27, Row-28, Row-37, Row-41, Row-42, Row-43, Row-44, Row-45']
 
-compare the above list 2 on list1 and let me know the difference page wise suppose if there ['page1:Row11,Row13'] in list2 and ['page1:Row11,Row13,Row21,Row23'] in list1 
-then there is no difference right list rows exists in in list1 so i should get a list as it should have different_from_before when the rows different from list2 to list1 i request donot show oversight the results has be very accurate give me the list 1st and python code as well
-
-.always compare list2 on list1 understood?
-
-list1 'Page 7 : Row-26, Row-27, Row-28, Row-29, Row-30, Row-31, Row-32, Row-33, Row-34, Row-35, Row-36, Row-37', 
-list2  'Page 7 : Row-29, Row-30'
-
-for page7 rows in list2 are already there in list1 so no difference exists its that simple
-
-list1 'Page 6 : Row-2, Row-3, Row-4, Row-5, Row-6, Row-7, Row-8, Row-9, Row-10, Row-11, Row-12, Row-13, Row-14, Row-15, Row-16, Row-17, Row-18, Row-19, Row-20, Row-21, Row-22, Row-23, Row-24, Row-25', 'Page 7 : Row-26, Row-27, Row-28, Row-29, Row-30, Row-31, Row-32, Row-33, Row-34, Row-35, Row-36, Row-37',
-list2 'Page 6 : Row-2, Row-3, Row-4, Row-5, Row-6, Row-7, Row-8, Row-9, Row-10, Row-11, Row-12, Row-13, Row-14, Row-15, Row-16, Row-17, Row-18, Row-19, Row-20, Row-21, Row-22, Row-23, Row-24, Row-25',
-
-so in list2 for page6 all the rows which are there were already present in list1 of page6 so no new rows or no difference exists its that simple
-
-list1  'Page 12 : Row-21, Row-22',
-list2 'Page 12 : Row-2, Row-3, Row-21, Row-22',
-so in list page12 is having new rows Row-2,Row-3 which not there in list1 so that has be there in difference_from_before list its that simple
-
-list1  'Page 16 : Row-7, Row-8, Row-9, Row-10, Row-11, Row-12, Row-13, Row-14, Row-15, Row-17, Row-20, Row-21, Row-22', 
-list2 'Page 16 : Row-2, Row-3, Row-7, Row-8, Row-9, Row-10, Row-11, Row-12, Row-13, Row-14, Row-15, 
-
-so in list2 for page16 only Row-2,Row-3 are new rows when compared to list1 page16 its that simple these 2 rows need be under page16 in difference_from_before list
-
-do the same way for entire in same way why its difficult for you
+just compare list2 with list1 by pagewise and when the page you are checking in list2 doesnt have the same rows from list1 for that page then just add
+that in a new list called difference and why while checking in list2 on list1 ignore the rows for that particular page when its as in list1.
+i need difference list first then python code
