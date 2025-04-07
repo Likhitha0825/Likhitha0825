@@ -1,39 +1,14 @@
-    def populate_pass_or_fail(self,row,temp_dict,ind,li):
-        try:
-            if row["conf_score"]==100:
-                temp_dict[ind]["Passed"].append(li[2])
-            else:
-                temp_dict[ind]["Failed"].append(li[2])
-        except Exception as e:
-            logger.exception(f'error in populate_pass_or_fail as {e}')
+Library OpenSSL
+Python 3.6.x Max Version - 1.1.0 officially (1.1.1 works unofficially)
+Python 3.11.x Max Version - 3.0.x supported
 
 
 
+libffi
+Python 3.6.x Max Version -  3.2.x
+Python 3.11.x Max Version - 3.4.x
 
 
-
-
-
-
-def check_pass_or_fail(self,work_dict,alr_added,temp_dict):
-        for i,row in work_dict.iterrows():
-            try:
-                d2=None
-                d1 = parse(str(row['transaction date']).strip(), fuzzy=True)
-                if d1.year<2000 or d1.year>date.today().year:
-                    raise InvalidDate
-                if Bank.VAL_DATE in row.keys():
-                    d2=parse(str(row[Bank.VAL_DATE]).strip(), fuzzy=True)
-                    if d2.year<2000 or d2.year>date.today().year:   
-                        raise InvalidDate
-            except Exception as f:
-                row['conf_score']=60
-                logger.info(f'Exception inside validate bank as {f}')
-            li=row["name"].split('|')
-            ind=li[1]
-            if ind not in alr_added:
-                alr_added.append(ind)
-                temp_dict[ind]={}
-                temp_dict[ind]["Passed"]=[]
-                temp_dict[ind]["Failed"]=[]
-            self.populate_pass_or_fail(row,temp_dict,ind,li)
+zlib
+Python 3.6.x Max Version - 1.2.11+
+Python 3.11.x Max Version - 1.2.11+
