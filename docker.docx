@@ -1,0 +1,24 @@
+Docker 
+A way to package software so it can run on any hardware. 
+
+How does this process work?  
+
+With these 3 things: 
+
+Docker file: A blueprint for building a docker image. 
+
+Image: A template for running docker containers. 
+
+Containers: Is just a running process. 
+
+An Example:  
+
+where we have a node application, we need to have a server that's running the same version of the node and also it has installed the all these dependencies it works on my machine if someone else with a different machine tries to run this application with a different version of the node it might break. The whole point of docker is to solve problems like these by reproducing environments. The developer who creates the software can define the environment with the docker file, then any developer at that point can use the docker file to rebuild the environment which is saved as an immutable snapshot known as an image file. 
+
+Images can be uploaded to the cloud in both public and private registries. Then any developer or server that wants to run that software can pull that image down to create a container which is just a running process of that image. 
+
+One image file can be used to spawn the same process multiple times in multiple places and in that point where tools like Kubernetes and swarm come into play to scale containers to an infinite workload  
+
+ 
+
+ 
